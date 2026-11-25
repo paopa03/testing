@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever Yours, Maimai</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(150deg, #ffd9e6 0%, #ffe9ef 35%, #fff4d9 70%, #ffe6f0 100%);
+    background-attachment: fixed;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    padding: 40px 20px;
+  }
+
+  /* soft glowing orbs behind everything */
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before {
+    width: 480px; height: 480px;
+    background: #ffb8cf;
+    top: -140px; left: -120px;
+  }
+  body::after {
+    width: 420px; height: 420px;
+    background: #ffe08a;
+    bottom: -120px; right: -100px;
+  }
+
+  #floatLayer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .float {
+    position: absolute;
+    bottom: -60px;
+    opacity: 0;
+    animation: rise linear forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) rotate(0deg) scale(0.6); opacity: 0; }
+    10%  { opacity: 1; }
+    85%  { opacity: 0.85; }
+    100% { transform: translateY(-115vh) rotate(40deg) scale(1.1); opacity: 0; }
+  }
+
+  .stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 28px;
+    padding: 56px 40px 48px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(214, 130, 160, 0.22);
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: #c98a9e;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 6vw, 54px);
+    line-height: 1.15;
+    color: #8c4a5f;
+    margin-bottom: 8px;
+  }
+
+  h1 em {
+    display: block;
+    font-style: italic;
+    color: #b8627f;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 28px 0;
+    color: #e8a8bd;
+    font-size: 14px;
+  }
+  .divider span.line {
+    width: 56px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e8a8bd, transparent);
+  }
+
+  .note {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(16px, 2.6vw, 20px);
+    line-height: 1.7;
+    color: #7d5462;
+    max-width: 440px;
+    margin: 0 auto 36px;
+  }
+
+  .btn {
+    position: relative;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 17px 42px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, #f4a3bd 0%, #f7c1a8 50%, #f8d97e 100%);
+    background-size: 200% 200%;
+    box-shadow: 0 12px 28px rgba(230, 140, 170, 0.38);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, background-position 0.6s ease;
+    animation: shimmer 6s ease infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  .btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 18px 38px rgba(230, 140, 170, 0.48);
+  }
+  .btn:active { transform: translateY(0) scale(0.99); }
+
+  .hint {
+    margin-top: 22px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #cfa8b6;
+  }
+
+  /* second page */
+  .page-two {
+    display: none;
+    animation: fadeUp 0.9s ease forwards;
+  }
+  .page-two.show { display: block; }
+  .page-one.hide { display: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .letter {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(16px, 2.6vw, 19px);
+    line-height: 1.9;
+    color: #7d5462;
+    text-align: left;
+    margin-bottom: 30px;
+  }
+  .letter p { margin-bottom: 18px; }
+  .signature {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: #b8627f;
+    text-align: right;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 42px 24px 38px; border-radius: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="floatLayer"></div>
+
+<div class="stage">
+
+  <!-- PAGE ONE -->
+  <div class="card page-one" id="pageOne">
+    <p class="eyebrow">For Maimai</p>
+    <h1>Forever Yours<em>Maimai</em></h1>
+
+    <div class="divider">
+      <span class="line"></span>
+      <span>♡</span>
+      <span class="line"></span>
+    </div>
+
+    <p class="note">"You are the girl I need for the rest of my life. Never forget that, my sweet princess."</p>
+
+    <button class="btn" id="continueBtn">Click to continue!</button>
+
+    <p class="hint">tap anywhere for hearts &amp; flowers</p>
+  </div>
+
+  <!-- PAGE TWO -->
+  <div class="card page-two" id="pageTwo">
+    <p class="eyebrow">A little more</p>
+    <h1>Always You<em>my princess</em></h1>
+
+    <div class="divider">
+      <span class="line"></span>
+      <span>✿</span>
+      <span class="line"></span>
+    </div>
+
+    <div class="letter">
+      <p>If I could bottle the way you laugh, I would keep it in my pocket and open it on the days the world feels heavy.</p>
+      <p>You are not a chapter in my life — you are the whole book, the margins, the ink, the reason I keep writing.</p>
+      <p>So here is my promise, simple and steady: I will choose you on the easy days and the impossible ones. Every single time.</p>
+    </div>
+
+    <p class="signature">Forever yours, Paopao</p>
+
+    <button class="btn" id="backBtn" style="margin-top:26px;">Back to the start</button>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var layer = document.getElementById('floatLayer');
+  var glyphs = ['♡', '♥', '✿', '❀', '❁', '✧'];
+  var colors = ['#f2a7bd', '#f7c9a8', '#f8d97e', '#f5b8d0', '#fbe3a1'];
+
+  function spawn(xPercent, yPercent, big) {
+    var el = document.createElement('span');
+    el.className = 'float';
+    el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    el.style.left = (xPercent !== undefined ? xPercent : Math.random() * 100) + '%';
+    el.style.bottom = (yPercent !== undefined ? (100 - yPercent) : -8) + '%';
+    el.style.fontSize = (big ? 22 + Math.random() * 26 : 12 + Math.random() * 20) + 'px';
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDuration = (6 + Math.random() * 5) + 's';
+    el.style.textShadow = '0 2px 10px rgba(240, 170, 195, 0.45)';
+    layer.appendChild(el);
+    setTimeout(function () { el.remove(); }, 11500);
+  }
+
+  // gentle ambient drift
+  setInterval(function () { spawn(); }, 650);
+
+  // burst on tap / click
+  document.addEventListener('click', function (e) {
+    var x = (e.clientX / window.innerWidth) * 100;
+    var y = (e.clientY / window.innerHeight) * 100;
+    for (var i = 0; i < 8; i++) {
+      (function (i) {
+        setTimeout(function () {
+          spawn(x + (Math.random() * 14 - 7), y, true);
+        }, i * 70);
+      })(i);
+    }
+  });
+
+  // page switch
+  var pageOne = document.getElementById('pageOne');
+  var pageTwo = document.getElementById('pageTwo');
+
+  document.getElementById('continueBtn').addEventListener('click', function (e) {
+    e.stopPropagation();
+    pageOne.classList.add('hide');
+    pageTwo.classList.add('show');
+    for (var i = 0; i < 24; i++) {
+      (function (i) {
+        setTimeout(function () { spawn(Math.random() * 100, 100, true); }, i * 55);
+      })(i);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.getElementById('backBtn').addEventListener('click', function (e) {
+    e.stopPropagation();
+    pageTwo.classList.remove('show');
+    pageOne.classList.remove('hide');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>
